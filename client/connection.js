@@ -5,14 +5,13 @@
 let main = require('./main'),
 	{$, _, common, config, connSM, state} = main;
 
-let SockJS = window.SockJS,
-	socket, attempts, attemptTimer;
+let socket, attempts, attemptTimer;
 
 function send(msg) {
 	// need deferral or reporting on these lost messages...
 	if (connSM.state != 'synced' && connSM.state != 'syncing')
 		return;
-	if (socket.readyState != SockJS.OPEN) {
+	if (socket.readyState !== 1) {
 		if (console)
 			console.warn("Attempting to send while socket closed");
 		return;
@@ -73,20 +72,7 @@ function connect() {
 }
 
 function new_socket() {
-	var protocols = [
-		'xdr-streaming',
-		'xhr-streaming',
-		'iframe-eventsource',
-		'iframe-htmlfile',
-		'xdr-polling',
-		'xhr-polling',
-		'iframe-xhr-polling',
-		'jsonp-polling'
-	];
-	if (config.USE_WEBSOCKETS)
-		protocols.unshift('websocket');
-	return new SockJS(config.SOCKET_URL || config.SOCKET_PATH, null, {
-		protocols_whitelist: protocols
+	return new WebSocket(config.SOCKET_URL || 'ws://' + window.location.host + config.SOCKET_PATH + '/websocket', null, {
 	});
 }
 
@@ -172,7 +158,7 @@ function window_focused() {
 	// try to get our SM up to date if possible
 	if (s == 'synced' || s == 'syncing' || s == 'conn') {
 		var rs = socket.readyState;
-		if (rs != SockJS.OPEN && rs != SockJS.CONNECTING) {
+		if (rs !== 1 && rs !== 0) {
 			connSM.feed('close');
 			return;
 		}
