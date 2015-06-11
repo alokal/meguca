@@ -72,8 +72,7 @@ function connect() {
 }
 
 function new_socket() {
-	return new WebSocket(config.SOCKET_URL || 'ws://' + window.location.host + config.SOCKET_PATH + '/websocket', null, {
-	});
+	return new WebSocket(config.SOCKET_URL || 'ws://' + window.location.host + config.SOCKET_PATH + '/websocket');
 }
 
 connSM.act('conn, reconn + open -> syncing', function () {
